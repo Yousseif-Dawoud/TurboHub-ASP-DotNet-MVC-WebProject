@@ -1,0 +1,138 @@
+﻿@model List<TurboHub.ViewModels.Admin.CarBrandViewModel>
+@{
+    ViewData["Title"] = "إدارة السيارات";
+}
+
+<div class="page-header">
+    <div>
+        <h2>إدارة السيارات</h2>
+        <p>إدارة الماركات والموديلات والمحركات</p>
+    </div>
+</div>
+
+<div class="cars-grid">
+
+    <!-- BRANDS -->
+    <div class="cars-column">
+        <div class="cars-column-header">
+            <div class="cars-column-title">
+                <span class="column-icon">🚗</span>
+                <span>الماركات</span>
+                <span class="column-count">@Model.Count</span>
+            </div>
+            <button class="cars-add-btn" id="addBrandBtn">
+                + إضافة
+            </button>
+        </div>
+        <div class="cars-column-body" id="brandsList">
+            @if (!Model.Any())
+            {
+                <div class="cars-empty">
+                    <div class="cars-empty-icon">🚗</div>
+                    <div>لا توجد ماركات بعد</div>
+                </div>
+            }
+            @foreach (var brand in Model)
+            {
+                <div class="cars-row" id="brand-@brand.Id"
+                     onclick="selectBrand(@brand.Id, '@brand.Name')">
+                    <div class="cars-row-content">
+                        <div class="cars-row-name">@brand.Name</div>
+                        <div class="cars-row-sub">@brand.ModelsCount موديل</div>
+                    </div>
+                    <div class="cars-row-actions">
+                        <button class="cars-action-btn edit"
+                                onclick="event.stopPropagation();
+                            openEditModal('brand', @brand.Id, '@brand.Name')">
+                            ✏️
+                        </button>
+                        <button class="cars-action-btn delete"
+                                onclick="event.stopPropagation();
+                            deleteItem('brand', @brand.Id)">
+                            🗑️
+                        </button>
+                    </div>
+                    <span class="cars-row-arrow">›</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- MODELS -->
+    <div class="cars-column">
+        <div class="cars-column-header">
+            <div class="cars-column-title">
+                <span class="column-icon">📋</span>
+                <span id="modelsTitle">الموديلات</span>
+                <span class="column-count" id="modelsCount" style="display:none">0</span>
+            </div>
+            <button class="cars-add-btn" id="addModelBtn" style="display:none">
+                + إضافة
+            </button>
+        </div>
+        <div class="cars-column-body" id="modelsList">
+            <div class="cars-empty">
+                <div class="cars-empty-icon">👈</div>
+                <div>اختر ماركة أولاً</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENGINES -->
+    <div class="cars-column">
+        <div class="cars-column-header">
+            <div class="cars-column-title">
+                <span class="column-icon">⚙️</span>
+                <span id="enginesTitle">المحركات</span>
+                <span class="column-count" id="enginesCount" style="display:none">0</span>
+            </div>
+            <button class="cars-add-btn" id="addEngineBtn" style="display:none">
+                + إضافة
+            </button>
+        </div>
+        <div class="cars-column-body" id="enginesList">
+            <div class="cars-empty">
+                <div class="cars-empty-icon">👈</div>
+                <div>اختر موديلاً أولاً</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="carsModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-bold" id="modalTitle">إضافة</h6>
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="modalItemId" value="0" />
+                <input type="hidden" id="modalType" value="" />
+                <div class="mb-2">
+                    <label class="form-label small">الاسم *</label>
+                    <input type="text" id="modalName"
+                           class="form-control form-control-sm" />
+                    <div class="text-danger small mt-1" id="modalError"></div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn-primary-admin btn-sm"
+                        id="modalSaveBtn">
+                    حفظ
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm"
+                        data-bs-dismiss="modal">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin-cars.js"></script>
+}

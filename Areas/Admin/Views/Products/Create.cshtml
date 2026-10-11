@@ -1,0 +1,251 @@
+﻿@model TurboHub.ViewModels.Admin.ProductViewModel
+@{
+    ViewData["Title"] = "إضافة منتج جديد";
+    var brands = ViewBag.CarBrands as List<dynamic>
+        ?? new List<dynamic>();
+}
+
+@using TurboHub.Areas.Admin.Controllers 
+
+<div class="page-header">
+    <div>
+        <h2>إضافة منتج جديد</h2>
+        <p>أدخل تفاصيل قطعة الغيار الجديدة</p>
+    </div>
+    <a href="/Admin/Products" class="btn-primary-admin">→ رجوع</a>
+</div>
+
+<form asp-action="Create" asp-controller="Products" asp-area="Admin"
+      method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    <div class="row g-4">
+
+        <!-- RIGHT COLUMN — Main Info -->
+        <div class="col-md-8">
+
+            <!-- Basic Info -->
+            <div class="admin-form-card mb-4">
+                <h6 class="fw-bold mb-4" style="color:#1a1a2e">
+                    المعلومات الأساسية
+                </h6>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label asp-for="Name" class="form-label">
+                            اسم المنتج *
+                        </label>
+                        <input asp-for="Name" class="form-control"
+                               placeholder="مثال: فلتر زيت تويوتا كورولا" />
+                        <span asp-validation-for="Name"
+                              class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="SKU" class="form-label">
+                            رقم القطعة (SKU)
+                            <span class="text-muted small">(تلقائي)</span>
+                        </label>
+                        <input asp-for="SKU" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Brand" class="form-label">
+                            الماركة التجارية
+                        </label>
+                        <input asp-for="Brand" class="form-control"
+                               placeholder="مثال: Bosch, NGK" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="CategoryId" class="form-label">
+                            القسم *
+                        </label>
+                        <select asp-for="CategoryId"
+                                asp-items="ViewBag.Categories"
+                                class="form-select">
+                            <option value="">— اختر القسم —</option>
+                        </select>
+                        <span asp-validation-for="CategoryId"
+                              class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Price" class="form-label">
+                            السعر (جنيه) *
+                        </label>
+                        <input asp-for="Price" class="form-control"
+                               type="number" step="0.01" placeholder="0.00" />
+                        <span asp-validation-for="Price"
+                              class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="DiscountPrice" class="form-label">
+                            سعر الخصم (اختياري)
+                        </label>
+                        <input asp-for="DiscountPrice" class="form-control"
+                               type="number" step="0.01" placeholder="0.00" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="StockQuantity" class="form-label">
+                            الكمية المتاحة *
+                        </label>
+                        <input asp-for="StockQuantity" class="form-control"
+                               type="number" placeholder="0" />
+                        <span asp-validation-for="StockQuantity"
+                              class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Condition" class="form-label">
+                            حالة القطعة
+                        </label>
+                        <select asp-for="Condition"
+                                asp-items="ViewBag.Conditions"
+                                class="form-select"></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="WarrantyPeriod" class="form-label">
+                            فترة الضمان
+                        </label>
+                        <input asp-for="WarrantyPeriod" class="form-control"
+                               placeholder="مثال: 12 شهر" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="LowStockThreshold" class="form-label">
+                            حد المخزون المنخفض
+                        </label>
+                        <input asp-for="LowStockThreshold" class="form-control"
+                               type="number" />
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Description" class="form-label">
+                            الوصف التفصيلي
+                        </label>
+                        <textarea asp-for="Description" class="form-control"
+                                  rows="4"
+                                      placeholder="أدخل وصفاً تفصيلياً للقطعة...">
+                        </textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compatible Cars -->
+                <div class="admin-form-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="fw-bold mb-0" style="color:#1a1a2e">
+                            السيارات المتوافقة
+                        </h6>
+                        <button type="button" class="btn-primary-admin btn-sm"
+                                onclick="addCompatRow()">
+                            + إضافة سيارة
+                        </button>
+                    </div>
+                    <div id="compatList">
+                        <div class="text-muted small text-center py-3" id="noCompatMsg">
+                            لم تُضف أي سيارة بعد — اضغط "إضافة سيارة"
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- LEFT COLUMN — Images & Settings -->
+            <div class="col-md-4">
+
+                <!-- Main Image -->
+                <div class="admin-form-card mb-4">
+                    <h6 class="fw-bold mb-4" style="color:#1a1a2e">
+                        الصورة الرئيسية
+                    </h6>
+
+                    <!-- Preview -->
+                    <div id="mainImagePreview"
+                         style="width:100%;height:180px;background:#f8f9fa;
+                        border-radius:8px;border:2px dashed #e0e0e0;
+                        display:flex;align-items:center;
+                        justify-content:center;margin-bottom:12px;
+                        overflow:hidden;font-size:13px;color:#aaa">
+                        لا توجد صورة
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label small">رفع صورة</label>
+                        <input asp-for="MainImageFile" type="file"
+                               class="form-control form-control-sm"
+                               accept="image/*"
+                               onchange="previewMainImage(this)" />
+                    </div>
+                    <div class="text-center text-muted small my-2">— أو —</div>
+                    <div>
+                        <label class="form-label small">رابط صورة (URL)</label>
+                        <input asp-for="MainImageUrl" class="form-control form-control-sm"
+                               placeholder="https://..."
+                               oninput="previewMainUrl(this.value)" />
+                    </div>
+                </div>
+
+                <!-- Extra Images -->
+                <div class="admin-form-card mb-4">
+                    <h6 class="fw-bold mb-3" style="color:#1a1a2e">
+                        صور إضافية
+                    </h6>
+                    <div class="mb-2">
+                        <label class="form-label small">رفع صور متعددة</label>
+                        <input name="ExtraImageFiles" type="file"
+                               class="form-control form-control-sm"
+                               accept="image/*" multiple />
+                    </div>
+                    <div class="text-center text-muted small my-2">— أو —</div>
+                    <div id="extraUrlsList">
+                        <div class="input-group mb-2">
+                            <input type="text" name="ExtraImageUrls"
+                                   class="form-control form-control-sm"
+                                   placeholder="رابط صورة إضافية" />
+                            <button type="button"
+                                    class="btn btn-outline-secondary btn-sm"
+                                    onclick="addExtraUrlRow()">
+                                +
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div class="admin-form-card">
+                    <h6 class="fw-bold mb-3" style="color:#1a1a2e">الإعدادات</h6>
+                    <div class="form-check mb-2">
+                        <input asp-for="IsActive" type="checkbox"
+                               class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label small">
+                            نشط (يظهر في المتجر)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="IsFeatured" type="checkbox"
+                               class="form-check-input" />
+                        <label asp-for="IsFeatured" class="form-check-label small">
+                            مميز (يظهر في الرئيسية)
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn-primary-admin">
+                حفظ المنتج
+            </button>
+            <a href="/Admin/Products" class="btn btn-outline-secondary">
+                إلغاء
+            </a>
+        </div>
+
+    </form>
+
+<!-- Car Brands data for JS -->
+<script id="brandsData" type="application/json">
+    @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+        (List<TurboHub.Areas.Admin.Controllers.CarBrandJsonItem>)ViewBag.CarBrands
+    ))
+</script>
+
+@section Scripts {
+    <script src="~/js/admin-products.js"></script>
+}

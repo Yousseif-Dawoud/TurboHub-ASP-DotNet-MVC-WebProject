@@ -1,0 +1,227 @@
+﻿@model List<TurboHub.ViewModels.Admin.ProductListViewModel>
+@{
+    ViewData["Title"] = "المنتجات";
+    int page = ViewBag.Page;
+    int totalPages = ViewBag.TotalPages;
+}
+
+<div class="page-header">
+    <div>
+        <h2>المنتجات</h2>
+        <p>إجمالي @ViewBag.Total منتج</p>
+    </div>
+    <a href="/Admin/Products/Create" class="btn-primary-admin">
+        + إضافة منتج
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="admin-form-card mb-4">
+    <form method="get" action="/Admin/Products">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">بحث</label>
+                <input type="text" name="search" value="@ViewBag.Search"
+                       class="form-control" placeholder="اسم المنتج أو SKU..." />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">القسم</label>
+                <select name="categoryId" asp-items="ViewBag.Categories"
+                        class="form-select">
+                    <option value="">كل الأقسام</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <div class="form-check mt-4">
+                    <input type="checkbox" name="lowStock" value="true"
+                           class="form-check-input" id="lowStock"
+                    @(ViewBag.LowStock == true ? "checked" : "") />
+                    <label class="form-check-label small" for="lowStock">
+                        مخزون منخفض
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-check mt-4">
+                    <input type="checkbox" name="inactive" value="true"
+                           class="form-check-input" id="inactive"
+                    @(ViewBag.Inactive == true ? "checked" : "") />
+                    <label class="form-check-label small" for="inactive">
+                        غير نشط
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn-primary-admin w-100">
+                    بحث
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Table -->
+<div class="admin-table">
+    <table>
+        <thead>
+            <tr>
+                <th>المنتج</th>
+                <th>SKU</th>
+                <th>القسم</th>
+                <th>السعر</th>
+                <th>المخزون</th>
+                <th>الحالة</th>
+                <th>الإجراءات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                        لا توجد منتجات — أضف أول منتج الآن
+                    </td>
+                </tr>
+            }
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            @if (!string.IsNullOrEmpty(p.MainImage))
+                            {
+                                <img src="@p.MainImage" alt="@p.Name"
+                                     style="width:44px;height:44px;
+                                object-fit:cover;border-radius:8px;
+                                border:1px solid #e9ecef" />
+                            }
+                            else
+                            {
+                                <div style="width:44px;height:44px;background:#f0f0f0;
+                                    border-radius:8px;display:flex;
+                                    align-items:center;justify-content:center;
+                                    font-size:20px">
+                                    🔧
+                                </div>
+                            }
+                            <div>
+                                <div style="font-weight:500;font-size:13px">
+                                    @p.Name
+                                </div>
+                                @if (p.IsFeatured)
+                                {
+                                    <span class="badge-delivered" style="font-size:10px">
+                                        مميز
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span style="font-family:monospace;font-size:12px;
+                            color:#666">
+                            @(p.SKU ?? "—")
+                        </span>
+                    </td>
+                    <td>@(p.CategoryName ?? "—")</td>
+                    <td>
+                        @if (p.DiscountPrice.HasValue)
+                        {
+                            <div style="font-weight:600;color:#e94560">
+                                @p.DiscountPrice.Value.ToString("N0") جنيه
+                            </div>
+                            <div style="font-size:11px;color:#999;
+                                text-decoration:line-through">
+                                @p.Price.ToString("N0") جنيه
+                            </div>
+                        }
+                        else
+                        {
+                            <span style="font-weight:600">
+                                @p.Price.ToString("N0") جنيه
+                            </span>
+                        }
+                    </td>
+                    <td>
+                        @if (p.StockQuantity == 0)
+                        {
+                            <span class="badge-cancelled">نفذ</span>
+                        }
+                        else if (p.StockQuantity <= p.LowStockThreshold)
+                        {
+                            <span class="badge-pending">
+                                @p.StockQuantity قطعة
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge-delivered">
+                                @p.StockQuantity قطعة
+                            </span>
+                        }
+                    </td>
+                    <td>
+                        <button onclick="toggleActive(@p.Id, this)"
+                                class="@(p.IsActive ? "badge-delivered" : "badge-cancelled")"
+                                style="border:none;cursor:pointer;font-size:12px"
+                                title="اضغط لتغيير الحالة">
+                            @(p.IsActive ? "نشط" : "معطل")
+                        </button>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a href="/Admin/Products/Edit/@p.Id"
+                               class="btn-edit">تعديل</a>
+                            <form action="/Admin/Products/Delete/@p.Id"
+                                  method="post"
+                                  onsubmit="return confirm('هل أنت متأكد من حذف هذا المنتج؟')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn-delete">
+                                    حذف
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+@if (totalPages > 1)
+{
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <a href="/Admin/Products?page=@i&search=@ViewBag.Search
+                &categoryId=@ViewBag.CategoryId"
+                   class="@(i == page ? "btn-primary-admin" : "btn btn-outline-secondary")"
+                   style="padding:6px 14px;font-size:13px">
+                @i
+            </a>
+        }
+    </div>
+}
+
+@section Scripts {
+    <script>
+        async function toggleActive(id, btn) {
+            const token = document.querySelector(
+                'input[name="__RequestVerificationToken"]')?.value;
+            const res = await fetch('/Admin/Products/ToggleActive', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `id=${id}&__RequestVerificationToken=${token}`
+            });
+            const data = await res.json();
+            if (data.success) {
+                btn.textContent = data.isActive ? 'نشط' : 'معطل';
+                btn.className = data.isActive ? 'badge-delivered' : 'badge-cancelled';
+                btn.style.cssText = 'border:none;cursor:pointer;font-size:12px';
+            }
+        }
+    </script>
+}

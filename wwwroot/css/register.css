@@ -1,0 +1,125 @@
+﻿body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.register-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+}
+
+.register-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    overflow: hidden;
+    width: 100%;
+    max-width: 900px;
+}
+
+.register-left {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+}
+
+.register-right {
+    padding: 48px 40px;
+}
+
+.brand-logo {
+    font-size: 28px;
+    font-weight: 700;
+    color: #e94560;
+    margin-bottom: 16px;
+}
+
+.brand-tagline {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.brand-sub {
+    font-size: 14px;
+    opacity: 0.8;
+    line-height: 1.6;
+}
+
+.stats-row {
+    display: flex;
+    gap: 32px;
+    margin-top: 32px;
+    justify-content: center;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: 700;
+    color: #e94560;
+}
+
+.stat-label {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.page-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 6px;
+}
+
+.page-sub {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 28px;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    padding: 10px 14px;
+    font-size: 14px;
+}
+
+    .form-control:focus {
+        border-color: #0f3460;
+        box-shadow: 0 0 0 3px rgba(15, 52, 96, 0.1);
+    }
+
+.btn-register {
+    background: #0f3460;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    width: 100%;
+    transition: background 0.3s;
+}
+
+    .btn-register:hover {
+        background: #16213e;
+        color: white;
+    }

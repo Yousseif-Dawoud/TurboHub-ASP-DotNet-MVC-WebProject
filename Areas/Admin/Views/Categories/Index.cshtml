@@ -1,0 +1,76 @@
+﻿@model List<TurboHub.ViewModels.Admin.CategoryViewModel>
+@{
+    ViewData["Title"] = "الأقسام";
+}
+
+<div class="page-header">
+    <div>
+        <h2>الأقسام</h2>
+        <p>إدارة أقسام قطع الغيار</p>
+    </div>
+    <a href="/Admin/Categories/Create" class="btn-primary-admin">
+        <span>+</span>
+        <span>إضافة قسم جديد</span>
+    </a>
+</div>
+
+<div class="admin-table">
+    <div class="table-header">
+        <h5>قائمة الأقسام (@Model.Count)</h5>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>اسم القسم</th>
+                <th>الأيقونة</th>
+                <th>القسم الرئيسي</th>
+                <th>عدد المنتجات</th>
+                <th>الإجراءات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">
+                        لا توجد أقسام بعد — أضف أول قسم الآن
+                    </td>
+                </tr>
+            }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>
+                        <strong>@item.Name</strong>
+                    </td>
+                    <td>@(item.Icon ?? "—")</td>
+                    <td>
+                        @if (item.ParentId == null)
+                        {
+                            <span class="badge-delivered">رئيسي</span>
+                        }
+                        else
+                        {
+                            <span class="badge-processing">فرعي</span>
+                        }
+                    </td>
+                    <td>@item.ProductCount منتج</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a href="/Admin/Categories/Edit/@item.Id"
+                               class="btn-edit">تعديل</a>
+                            <form action="/Admin/Categories/Delete/@item.Id"
+                                  method="post"
+                                  onsubmit="return confirm('هل أنت متأكد من حذف هذا القسم؟')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn-delete">حذف</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
