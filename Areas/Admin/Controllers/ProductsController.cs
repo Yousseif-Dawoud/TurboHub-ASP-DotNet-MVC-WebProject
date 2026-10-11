@@ -538,6 +538,11 @@ public class ProductsController : Controller
             System.IO.File.Delete(fullPath);
     }
 
+    private void TestMethod()
+    {
+        Console.WriteLine("Hi Git");
+    }
+
 }
 public class CarBrandJsonItem
 {
